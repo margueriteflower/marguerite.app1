@@ -2,19 +2,28 @@
 	import ScrollTrigger from 'gsap/dist/ScrollTrigger';
 	import { onMount } from 'svelte';
 	import gsap from 'gsap';
+	import SplitText from '$lib/gsap/SplitText.js';
 
 	let ctx = $state();
 	let component = $state();
 
+	function resize() {
+		const width = window.innerWidth;
+		const topElement = component.querySelector('.list .top');
+
+		if (topElement && width < 980) {
+			// Par exemple, on peut ajuster à 10% de la hauteur de la fenêtre
+			topElement.style.top = `${width * 0.09}px`;
+		}
+	}
+
 	onMount(() => {
 		gsap.registerPlugin(ScrollTrigger);
 
-		let oSetter = gsap.utils.pipe(
-			gsap.quickSetter('.w', 'opacity') //apply it to the #id element's x property and append a "px" unit
-		);
+		let oSetter = gsap.utils.pipe(gsap.quickSetter('.w', 'opacity'));
 
 		ctx = gsap.context(() => {
-			// footer sticky
+			// Footer sticky
 			gsap.to('#footer', {
 				scrollTrigger: {
 					trigger: '#footer',
@@ -38,6 +47,25 @@
 					}
 				}
 			});
+
+			resize();
+
+			const split = new SplitText('.list .top', { type: 'chars' });
+			gsap.fromTo(
+				split.chars,
+				{ yPercent: 70 },
+				{
+					yPercent: 0,
+					stagger: 0.05,
+					duration: 0.8,
+					ease: 'power2.out',
+					scrollTrigger: {
+						trigger: '.list .top',
+						start: 'top bottom',
+						toggleActions: 'play none none reset'
+					}
+				}
+			);
 		});
 
 		return () => {
@@ -46,6 +74,8 @@
 		};
 	});
 </script>
+
+<svelte:window onresize={resize} />
 
 <div id="footer" bind:this={component}>
 	<div class="wrapper">
@@ -111,7 +141,7 @@
 				</ul>
 
 				<ul>
-					<li class="title">contact</li>
+					<li class="title">Contact</li>
 					<a href="mailto:contact@marguerite.app">contact@marguerite.app</a>
 				</ul>
 			</div>
@@ -134,7 +164,7 @@
 <style>
 	#footer {
 		position: sticky;
-		height: calc(100svh);
+		min-height: 100svh;
 		z-index: 99;
 		background: rgba(255, 255, 255, 1);
 		will-change: transform;
@@ -209,6 +239,8 @@
 			/* border-top: 1px solid rgba(0, 0, 0, 0.16); */
 			position: relative;
 			z-index: 10;
+
+			padding-top: 32px;
 		}
 
 		ul {
@@ -218,7 +250,6 @@
 			font-style: normal;
 			font-weight: 400;
 			line-height: 16px; /* 135.45% */
-			letter-spacing: -0.12px;
 			list-style-type: none;
 
 			display: flex;
@@ -226,7 +257,6 @@
 			gap: 10px;
 
 			padding-left: 0;
-			margin-top: 32px;
 
 			width: 170px;
 
@@ -267,6 +297,46 @@
 			width: 100%;
 
 			border-top: 1px solid rgba(0, 0, 0, 0.16);
+		}
+	}
+
+	@media (max-width: 1024px) {
+		.wrapper {
+			width: 100%;
+			padding-left: 10px;
+			padding-right: 10px;
+		}
+
+		.list {
+			.top {
+				font-size: 20.5vw;
+			}
+
+			.bottom {
+				flex-wrap: wrap;
+			}
+		}
+
+		.foot {
+			width: calc(100% - 20px);
+		}
+	}
+
+	@media (max-width: 768px) {
+		.top {
+			justify-content: space-between;
+		}
+		.description {
+			margin-top: 20%;
+			width: 90%;
+		}
+
+		.foot {
+			font-size: 10px;
+
+			a {
+				font-size: 10px;
+			}
 		}
 	}
 </style>

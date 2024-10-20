@@ -113,10 +113,6 @@
 		opacity: 0;
 	}
 
-	.text {
-		/* margin-top: 10px; */
-	}
-
 	h2 {
 		letter-spacing: -0.224px;
 		font-size: 14px;
